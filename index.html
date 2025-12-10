@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Usuń duplikaty (normalizacja)</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
+    textarea { width: 100%; height: 300px; }
+    #result { margin-top: 20px; background: #fff; padding: 10px; border-radius: 5px; }
+    button { padding: 10px 20px; margin-top: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<h2>Usuń duplikaty z listy polubień (ignorując wielkość liter i znaki)</h2>
+<textarea id="inputList" placeholder="Wklej tutaj swoją listę..."></textarea>
+<br>
+<button onclick="removeDuplicates()">Usuń duplikaty</button>
+
+<div id="result"></div>
+
+<script>
+// Funkcja do "normalizacji" tekstu: małe litery + usunięcie polskich znaków
+function normalizeText(str) {
+  return str.toLowerCase()
+            .normalize('NFD') // rozdzielanie znaków diakrytycznych
+            .replace(/[\u0300-\u036f]/g, '') // usuwanie polskich znaków
+            .replace(/\s+/g, ''); // opcjonalnie usuwanie spacji
+}
+
+function removeDuplicates() {
+  const input = document.getElementById('inputList').value;
+  const lines = input.split('\n').map(line => line.trim()).filter(line => line !== '');
+  
+  const seen = new Set();
+  const uniqueLines = [];
+
+  lines.forEach(line => {
+    const normalized = normalizeText(line);
+    if (!seen.has(normalized)) {
+      seen.add(normalized);
+      uniqueLines.push(line); // zachowujemy oryginalną wersję
+    }
+  });
+
+  const resultDiv = document.getElementById('result');
+  resultDiv.innerHTML = `<p>Liczba unikalnych wpisów: <b>${uniqueLines.length}</b></p>
+                         <p>${uniqueLines.join('<br>')}</p>`;
+}
+</script>
+
+</body>
+</html>
